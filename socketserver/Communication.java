@@ -14,6 +14,10 @@ public class Communication implements Serializable {
         this.data = data;
     }
 
+    public Communication() {
+
+    }
+
     public String getAction() {
         return action;
     }
