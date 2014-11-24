@@ -37,7 +37,7 @@ public class SocketHandler {
                     outToClient.writeObject(response);
                 }
             }
-
+            args[args.length - 1]
         }
         catch (Exception e) {
             e.printStackTrace();
