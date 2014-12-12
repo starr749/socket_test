@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
  */
 public class FileIO {
 
-    public Object loadPlayer() {
+    public static Object loadPlayer() {
         File file = new File("player.json");
         Object player = null;
         try {
@@ -30,7 +30,7 @@ public class FileIO {
         return player;
     }
 
-    public void savePlayer(Player player) {
+    public static void savePlayer(Player player) {
         File file = new File("player.json");
         try {
             FileOutputStream fileStream = new FileOutputStream(file);
@@ -42,5 +42,16 @@ public class FileIO {
             e.printStackTrace();
         }
 
+    }
+    public static void main(String args[]) {
+        Player test = new Player();
+        test.setName("Bob");
+        test.setAttack(5);
+        test.setDefense(6);
+        test.setHp(50);
+
+        savePlayer(test);
+
+        System.out.println(loadPlayer());
     }
 }
