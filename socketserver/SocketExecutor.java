@@ -16,12 +16,12 @@ import java.util.concurrent.Executors;
 public class SocketExecutor {
     private static final int HANDLERS = 10;
     private ExecutorService pool = null;
+    public static SocketHandler listener;
 
     public SocketExecutor() {
         try {
             pool = Executors.newFixedThreadPool(HANDLERS);
-            SocketHandler listener = new SocketHandler();
-            pool.submit(listener);
+            listener = new SocketHandler();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -29,16 +29,17 @@ public class SocketExecutor {
 
     public static void main(String[] args) {
         SocketExecutor socketServer = new SocketExecutor();
+        SocketExecutor.listener.listen();
     }
 
-    public class SocketHandler implements Runnable {
+    public class SocketHandler {
         private ServerSocket listener = null;
 
         public SocketHandler() throws IOException {
             listener = new ServerSocket(8100);
         }
 
-        public void run() {
+        public void listen() {
 
             try {
                 System.out.println("Socket Server is running");
@@ -55,41 +56,42 @@ public class SocketExecutor {
                 pool.shutdown();
             }
         }
+    }
 
 
-        class RequestHandler implements Runnable {
-            private final Socket socket;
+    class RequestHandler implements Runnable {
+        private final Socket socket;
 
-            public RequestHandler(Socket socket) {
+        public RequestHandler(Socket socket) {
                 this.socket = socket;
             }
 
-            public void run() {
+        public void run() {
 
-                try {
-                    //setup streams
-                    JSONInputStream inFromClient = new JSONInputStream(socket.getInputStream());
-                    JSONOutputStream outToClient = new JSONOutputStream(socket.getOutputStream());
+            try {
+                   //setup streams
+                JSONInputStream inFromClient = new JSONInputStream(socket.getInputStream());
+                JSONOutputStream outToClient = new JSONOutputStream(socket.getOutputStream());
 
-                    while (true) {
-                        System.out.println("Have a connection, waiting for message");
-                        HashMap map = (HashMap) inFromClient.readObject();
-                        System.out.println("Got: " + map + " from client");
-                        Communication response = new Communication();
-                        if (map.get("data") != null) {
-                            response.setAction("Completed");
-                            response.setData(map.get("data"));
-                        } else {
-                            response.setAction("Completed");
-                            response.setData(map.toString());
-                        }
-                        outToClient.writeObject(response);
+                while (true) {
+                    System.out.println("Have a connection, waiting for message");
+                    HashMap map = (HashMap) inFromClient.readObject();
+                    System.out.println("Got: " + map + " from client");
+                    Communication response = new Communication();
+                    if (map.get("data") != null) {
+                        response.setAction("Completed");
+                        response.setData(map.get("data"));
+                    } else {
+                        response.setAction("Completed");
+                        response.setData(map.toString());
                     }
-                } catch (Exception e) {
-                    System.out.println(e);
+                    outToClient.writeObject(response);
                 }
+            } catch (Exception e) {
+                System.out.println(e);
             }
         }
-
     }
+
 }
+
